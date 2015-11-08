@@ -84,7 +84,7 @@ function changeImage() {
 
 	if ((intTemp >= 0 ) && (intTemp <= (IBYJDIM - 1)) ) {
 
-		document.images[intTemp].src = '../image/be_ball.gif'
+		document.images[intTemp].src = './image/be_ball.gif'
 //		document.images[intTemp].width = document.images[intTemp].width +5
 //		document.images[intTemp].height = document.images[intTemp].height +5
 	}
@@ -125,7 +125,7 @@ function elementClickOn(intPos) {
 				if ((intPosAdj >= 0 ) && (intPosAdj <= (IBYJDIM - 1)) ) {
 					if (((intclickedj + intjChange) < JDIM) && ((intclickedj + intjChange) >= 0)) {
 						intcnt = intcnt + 1
-						document.images[intPosAdj].src = '../image/gn_ball.gif'
+						document.images[intPosAdj].src = './image/gn_ball.gif'
 						elementringtemp[intcnt] = intPosAdj
 					}
 				}
@@ -155,7 +155,7 @@ for (var i = 0; i < IDIM; i++) {
 		IBYJTH = i*JDIM + j
 		iscaled = IOFF + (i * 15)
 		jscaled = JOFF + (j * 15)
-		page += "<IMG ID=ball_" + i + "_" + j + " SRC='../image/be_ball.gif' WIDTH='10' HEIGHT='10' STYLE='position:absolute; left:" + iscaled + "px;top:" + jscaled + "px;' onmousedown='elementClickOn(" + IBYJTH + ")'>"
+		page += "<IMG ID=ball_" + i + "_" + j + " SRC='./image/be_ball.gif' WIDTH='10' HEIGHT='10' STYLE='position:absolute; left:" + iscaled + "px;top:" + jscaled + "px;' onmousedown='elementClickOn(" + IBYJTH + ")'>"
 		}
 	}
 document.write(page)
