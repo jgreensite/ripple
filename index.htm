@@ -1,0 +1,206 @@
+<HTML>
+<HEAD>
+<TITLE>Array Code</TITLE>
+<SCRIPT LANGUAGE="JavaScript1.1">
+// constants
+// For speed-up trap the javascript 'done' message in window status
+
+var IDIM = 20
+var JDIM = 20
+var IBYJDIM = IDIM * JDIM
+var IBYJTH
+var RADIUSSTART = 1
+var RADIUSEND = 4
+var PAUSEUPDATEIMAGE = 15
+var PAUSERANDOMCLICK = 500
+var MAXOBJS = 150
+var IOFF = 200
+var JOFF = 200
+var strDropDown
+
+// used to pass the current object that is being worked on
+var objCurrObj
+
+//used to keep the temp array full of objects to turn blue
+var intcnt = -1
+elementringtemp = new Array(1)
+
+elementibyj = new Array(IBYJDIM)
+elementring = new Array(1)
+
+
+// stuff "rows" of data for our pseudo-two-dimensional array
+function makenewelement(i,j, colour, display, value){
+this.i = i
+this.j = j
+this.colour = colour
+this.display = display
+this.value = value
+//window.status = this.i + " " + this.j;
+}
+
+// fill text area object with data from selected element
+function showData(form) {
+i = form.elements.selectedIndex
+var result = "The element has the following values"  + "\n"
+result += "i / row = " + elementring[i].i  + "\n"
+result += "j / column = " + elementring[i].j + "\n"
+result += "colour = " + elementring[i].colour + "\n"
+result += "display = " + elementring[i].display + "\n"
+result += "value = " + elementring[i].value
+form.elementinfo.value = result
+}
+
+function buildDropDown() {
+var page = "" // start assembling next part of page and form
+page += "<SELECT NAME='elements' onChange='showData(this.form)'> "
+
+// build drop down list from array
+for (var cnt = 0; cnt < IBYJDIM ; cnt++) {
+
+        // window.status = elementibyj.length
+
+	// write each item of the drop down list
+	page += "<OPTION" // OPTION tags
+
+	// select the first item
+	if (cnt == 0) { // pre-select first item in list
+		page += " SELECTED"
+	} // end select first item
+
+	page += ">" + cnt
+}
+page += "</SELECT><P>" // close selection item tag
+
+return page // lay out the drop down list
+}
+
+function changeImage() {
+	var intTemp
+	intTemp = elementringtemp[objCurrObj]
+//	window.status = "Object Array Ref:" + objCurrObj + "Object Array Num:" + intTemp + "Length" + elementringtemp.length
+	elementringtemp = elementringtemp.slice(objCurrObj)
+	intcnt = intcnt - 1
+
+	if ((intTemp >= 0 ) && (intTemp <= (IBYJDIM - 1)) ) {
+
+		document.images[intTemp].src = '../image/be_ball.gif'
+//		document.images[intTemp].width = document.images[intTemp].width +5
+//		document.images[intTemp].height = document.images[intTemp].height +5
+	}
+	else {
+//		window.alert(objCurrObj)
+	}
+//	objCurrObj = objCurrObj + 1
+}
+
+
+function elementClickOn(intPos) {
+//	window.alert("hi")
+	var intList = 0
+	var intPosAdj = 0
+	var intiChange
+	var intjChange
+	var intiSign
+	var intjSign
+	var intclickedj = (intPos % JDIM)
+//	var intcnt
+
+//	window.alert("POS =" + intPos + " i =" +intclickedi + " j =" + + intclickedj)
+//	window.alert("length of ring " + elementring.length)
+
+//	Commnented out to allow a global tally of images to update
+//	intcnt = -1
+//	elementringtemp = new Array(1)
+
+	for (intList = 0; intList <= elementring.length - 1; intList++ ) {
+
+//		window.alert(intList)
+		for (intiSign = -1; intiSign <= 1; intiSign = intiSign + 2 ) {
+			for (intjSign = -1; intjSign <= 1; intjSign = intjSign + 2 ) {
+				intiChange = intiSign * (JDIM * elementring[intList].i)
+				intjChange = intjSign * elementring[intList].j
+				intPosAdj =  intPos + intiChange + intjChange
+//				window.alert("Pos =" + intPos + " PosAdj =" +intPosAdj + " intiChange =" +intiChange + " intjChange =" +intjChange )
+				if ((intPosAdj >= 0 ) && (intPosAdj <= (IBYJDIM - 1)) ) {
+					if (((intclickedj + intjChange) < JDIM) && ((intclickedj + intjChange) >= 0)) {
+						intcnt = intcnt + 1
+						document.images[intPosAdj].src = '../image/gn_ball.gif'
+						elementringtemp[intcnt] = intPosAdj
+					}
+				}
+			}
+		}
+	}
+	objCurrObj = 1
+	for (intListTemp =0; intListTemp <= elementringtemp.length -1; intListTemp++ ) {
+		window.setTimeout("changeImage()",PAUSEUPDATEIMAGE * (intListTemp +1))
+	}
+}
+
+function randomClick() {
+	window.status = elementringtemp.length
+	if (elementringtemp.length < MAXOBJS) {
+		var intNewClick
+		intNewClick = Math.round(Math.random() * (IBYJDIM - 1)) + 0
+		elementClickOn(intNewClick)
+		window.setTimeout("randomClick()",PAUSERANDOMCLICK)
+	}
+}
+
+function buildGrid() {
+var page = ""
+for (var i = 0; i < IDIM; i++) {
+        for (var j = 0; j < JDIM; j++) {
+		IBYJTH = i*JDIM + j
+		iscaled = IOFF + (i * 15)
+		jscaled = JOFF + (j * 15)
+		page += "<IMG ID=ball_" + i + "_" + j + " SRC='../image/be_ball.gif' WIDTH='10' HEIGHT='10' STYLE='position:absolute; left:" + iscaled + "px;top:" + jscaled + "px;' onmousedown='elementClickOn(" + IBYJTH + ")'>"
+		}
+	}
+document.write(page)
+}
+
+//builds a set of concentric rings
+function buildRing() {
+	var page = ""
+	var i = 0
+	var j = 0
+	piby2 = Math.PI / 2
+	angleInc = Math.PI / 2
+	cnt = -1
+	for (var r = RADIUSSTART; r < RADIUSEND ; r++) {
+		angleInc = angleInc / 2
+        	for (var a = 0; a <= piby2; a = a + angleInc) {
+			cnt = cnt + 1
+                	i =  Math.floor(r * Math.cos(a))
+			j =  Math.floor(r * Math.sin(a))
+	        	elementring[cnt] = new makenewelement(i, j, "colour", "display", "value")
+//			document.write("r= " + r + " angle= " + (a * 180 / Math.PI) + " (i,j)= " + elementring[cnt].i + "," + elementring[cnt].j)
+		}
+//		window.alert(cnt + " " + elementring[cnt].i)
+	}
+}
+
+
+</SCRIPT>
+<BODY onLoad = "buildRing();randomClick()">
+<H1>Ripples</H1>
+<HR>
+
+<SCRIPT>
+buildGrid();
+</SCRIPT>
+
+<P>Select an element to view its data</P>
+<FORM>
+<SCRIPT>
+strDropDown = buildDropDown();
+document.write(strDropDown)
+</SCRIPT>
+<P>Here's the info</P>
+<TEXTAREA NAME="elementinfo" VALUE="Type in here" rows=10>
+</TEXTAREA>
+</FORM>
+</BODY>
+</HTML>
